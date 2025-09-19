@@ -1,0 +1,7 @@
+[package]
+name = "course-style"
+version = "0.0.1"
+entrypoint = "style.typ"
+authors = ["CADI TAZI Tawfiq"]
+license = "MIT"
+description = "Template for educational documents and courses"
