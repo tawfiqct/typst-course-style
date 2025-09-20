@@ -53,7 +53,7 @@
 #let set_correction(enabled) = correction_state.update(enabled)
 
 // Gaps to fill with optional correction
-#let gap(width: 100%, margin: 0.5em, correction: "") = context [
+#let gap(width: 100%, margin: 1em, correction: "") = context [
   #let correction_enabled = correction_state.get()
   #h(margin)
   #if correction_enabled and correction != "" [
@@ -69,9 +69,8 @@
   ] else [
     #box(rect(
       width: width,
-      height: 1em,
-      outset: 3pt,
-      inset: 3pt,
+      height: 0.5em,
+      outset: 5pt,
       stroke: (dash: "dotted", thickness: 0.7pt),
     ))
   ]
@@ -95,14 +94,15 @@
     box(width: 1fr, [
       #box(
         fill: yellow.lighten(80%),
-        inset: 3pt,
+        inset: (top: spacing + 0.2em),
         radius: 2pt,
+        height: spacing,
         text(size: 10pt, correction)
       )
       #h(1fr)
     ])
   } else {
-    box(width: 1fr, line(length: 100%, stroke: stroke))
+    box(width: 1fr, inset: (top: spacing + 0.2em), line(length: 100%, stroke: stroke, ))
   }
 
   // Additional lines if count > 1 (always dotted lines)
@@ -546,8 +546,8 @@
   
   show raw.where(block: false): it => box(
     fill: luma(235),
-    inset: (x: 3pt, y: 1pt),
-    outset: (y: 2pt),
+    inset: (x: 3pt),
+    outset: (y: 3pt),
     radius: 2pt,
   )[#it]
   
