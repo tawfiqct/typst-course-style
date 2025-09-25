@@ -437,7 +437,7 @@
   title: "Titre du document",
   academy: "ACADÉMIE DE NANTES",
   school: "LPO CARNOT BERTIN",
-  logo_path: "Tux.png",
+  logo_path: "logo.png",
   logo_width: 1cm,
   cell_fill_color: yellow,
   version: none,
@@ -498,34 +498,19 @@
   title: "Titre du document",
   academy: "ACADÉMIE DE NANTES",
   school: "LPO CARNOT BERTIN",
-  logo_path: "Tux.png",
+  logo_path: "logo.png",
   logo_width: 1cm,
   cell_fill_color: yellow,
   version: none,
   h2_prefix: none,  // Option pour ajouter un préfixe aux titres de niveau 2
   h2_prefix_word: "Partie",  // Mot à utiliser pour le préfixe
+  show_header: false,  // Option pour afficher l'en-tête
   body,
 ) = {
   // Simplified solution: fixed but optimized margins
   set page(
     numbering: "1",
-    margin: (top: 4cm, bottom: 1.2cm, left: 0.5cm, right: 0.5cm),
-    header: context {
-      if counter(page).get().first() == 1 {
-        HEADER(
-          class: class,
-          level: level,
-          duration: duration,
-          title: title,
-          academy: academy,
-          school: school,
-          logo_path: logo_path,
-          logo_width: logo_width,
-          cell_fill_color: cell_fill_color,
-          version: version,
-        )
-      }
-    },
+    margin: (top: 1cm, bottom: 1.2cm, left: 0.5cm, right: 0.5cm),
     footer: context {
       let current_page = counter(page).get().first()
       let total_pages = counter(page).final().first()
@@ -678,6 +663,22 @@
   show link: set text(fill: blue)
   show link: underline
 
-  [#body]
+  [
+    #if show_header [
+      #HEADER(
+        class: class,
+        level: level,
+        duration: duration,
+        title: title,
+        academy: academy,
+        school: school,
+        logo_path: logo_path,
+        logo_width: logo_width,
+        cell_fill_color: cell_fill_color,
+        version: version,
+      )
+    ]
+    #body
+  ]
 }
 
