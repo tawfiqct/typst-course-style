@@ -82,7 +82,7 @@ Ce document présente toutes les fonctionnalités disponibles dans le module `co
 - `title` : Titre du document (défaut: "Les données structurées")
 - `academy` : Académie (défaut: "ACADÉMIE")
 - `school` : Établissement (défaut: "Lycée XX")
-- `logo_path` : Chemin du logo (défaut: "Tux.png")
+- `logo_path` : Chemin du logo (défaut: "logo.png")
 - `logo_width` : Taille du logo (défaut: 1cm)
 - `cell_fill_color` : Couleur des cellules signature (défaut: yellow)
 

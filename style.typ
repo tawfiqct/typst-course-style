@@ -3,15 +3,13 @@
 #import "@preview/wrap-it:0.1.1": wrap-content
 #set text(lang: "fr")
 
+
 // ===============================
 // CONFIGURATION GLOBALE
 // ===============================
 
-// Global variable for corrections default
-#let CORRECTION_GLOBAL = true
-
 // State to control corrections from main document
-#let correction_state = state("correction_enabled", true)
+#let correction_state = state("correction_enabled", false)
 
 // ===============================
 // FONCTIONS UTILITAIRES
@@ -52,26 +50,36 @@
 // Function to enable/disable corrections
 #let set_correction(enabled) = correction_state.update(enabled)
 
-// Gaps to fill with optional correction
-#let gap(width: 100%, margin: 1em, correction: "") = context [
+// Gaps to fill with optional correction and customizable borders
+#let gap(
+  width: 100%,
+  margin: 1em,
+  correction: "",
+  stroke: (dash: "dotted", thickness: 0.7pt),
+  outset: auto,
+  height: auto,
+  fill: auto
+) = context [
   #let correction_enabled = correction_state.get()
   #h(margin)
   #if correction_enabled and correction != "" [
     #box(rect(
       width: width,
-      height: 1em,
-      outset: 3pt,
-      inset: 3pt,
-      stroke: (dash: "dotted", thickness: 0.7pt),
-      fill: yellow.lighten(80%),
+      height: if height == auto { 0.5em } else { height },
+      outset: if outset == auto { 5pt } else { outset },
+      inset: 0pt,
+      stroke: stroke,
+      fill: if fill == auto { yellow.lighten(80%) } else { fill },
       [#text(size: 9pt, correction)],
     ))
   ] else [
     #box(rect(
       width: width,
-      height: 0.5em,
-      outset: 5pt,
-      stroke: (dash: "dotted", thickness: 0.7pt),
+      inset: 0pt,
+      outset: if outset == auto { 5pt } else { outset },
+      height: if height == auto { 0.5em } else { height },
+      stroke: stroke,
+      fill: if fill == auto { none } else { fill },
     ))
   ]
   #h(margin)
@@ -94,10 +102,9 @@
     box(width: 1fr, [
       #box(
         fill: yellow.lighten(80%),
-        inset: (top: spacing + 0.2em),
         radius: 2pt,
         height: spacing,
-        text(size: 10pt, correction)
+        text(size: 8pt, correction)
       )
       #h(1fr)
     ])
@@ -160,7 +167,6 @@
 #let response_block(
   height: 3cm,
   width: 100%,
-  inset: 0.5cm,
   stroke: (dash: "dotted", thickness: 0.7pt),
   lines_count: 0,
   lines_spacing: 1em,
@@ -173,7 +179,7 @@
     block(
       width: width,
       height: height,
-      inset: inset,
+      inset: 0.5em,
       stroke: stroke,
       fill: yellow.lighten(80%),
       radius: 2pt,
@@ -194,7 +200,7 @@
     block(
       width: width,
       height: height,
-      inset: inset,
+      inset: 0.5em,
       stroke: stroke,
       [
         #if lines_count > 0 {
@@ -216,34 +222,8 @@
   breakable: true,
   content
 ) = context {
-  // Find the nearest heading level 2 or 3
-  let h2_locations = query(heading.where(level: 2))
-
-  let current_pos = here()
-
-  // Find the most recent heading (level 2) before current position
-  let most_recent_heading = none
-  let most_recent_page = 0
-
-  // Check level 2 headings
-  for h in h2_locations {
-    if h.location().page() <= current_pos.page() {
-      if h.location().page() > most_recent_page {
-        most_recent_heading = h
-        most_recent_page = h.location().page()
-      }
-    }
-  }
-
-
-  // Create unique counter based on heading
-  let counter_key = if most_recent_heading != none {
-    "activity-" + str(most_recent_heading.location().page()) + "-" + str(most_recent_heading.level)
-  } else {
-    "activity-default"
-  }
-
-  let activity_counter = counter(counter_key)
+  // Simple global counter for activities without reset
+  let activity_counter = counter("activity-global")
   activity_counter.step()
   let activity_num = activity_counter.get().first() + 1
 
@@ -429,6 +409,24 @@
 }
 
 // ===============================
+// LISTES AVEC PUCES PERSONNALISÉES
+// ===============================
+
+// Fonction pour créer des listes avec des puces spéciales
+#let special_list(marker: [▶], spacing: 0.6em, content) = {
+  set list(marker: marker, spacing: spacing)
+  content
+}
+
+// Variantes prédéfinies de listes spéciales
+#let arrow_list(content) = special_list(marker: [▶], content)
+#let check_list(content) = special_list(marker: [✓], content)
+#let star_list(content) = special_list(marker: [★], content)
+#let diamond_list(content) = special_list(marker: [◆], content)
+#let circle_list(content) = special_list(marker: [●], content)
+#let triangle_list(content) = special_list(marker: [▲], content)
+
+// ===============================
 // HEADER AND PAGE LAYOUT
 // ===============================
 
@@ -442,6 +440,7 @@
   logo_path: "Tux.png",
   logo_width: 1cm,
   cell_fill_color: yellow,
+  version: none,
 ) = {
   table(
     columns: (1fr, 2.5cm, 2.5cm, 2cm, 2cm, 2cm),
@@ -467,7 +466,7 @@
     ],
     
     // Line 3
-    table.cell(colspan: 2)[
+    table.cell(colspan: 2, inset: 1em)[
       #text(weight: "bold", size: 12pt)[
         
         
@@ -479,9 +478,15 @@
       str(pages) + " page" + if pages > 1 { "s" } else { "" }
     }*],
     
-    table.cell(fill: cell_fill_color, align: center)[],
+    table.cell(fill: cell_fill_color, align: center)[
+
+    ],
     table.cell(fill: cell_fill_color)[],
-    table.cell(fill: cell_fill_color)[],
+    table.cell(fill: cell_fill_color)[
+            #if version != none [
+        #text(size: 11pt, weight: "bold")[v#version]
+      ]
+    ],
   )
 }
 
@@ -496,12 +501,15 @@
   logo_path: "Tux.png",
   logo_width: 1cm,
   cell_fill_color: yellow,
+  version: none,
+  h2_prefix: none,  // Option pour ajouter un préfixe aux titres de niveau 2
+  h2_prefix_word: "Partie",  // Mot à utiliser pour le préfixe
   body,
 ) = {
   // Simplified solution: fixed but optimized margins
   set page(
     numbering: "1",
-    margin: (top: 2cm, bottom: 1.2cm, left: 0.5cm, right: 0.5cm),
+    margin: (top: 4cm, bottom: 1.2cm, left: 0.5cm, right: 0.5cm),
     header: context {
       if counter(page).get().first() == 1 {
         HEADER(
@@ -514,6 +522,7 @@
           logo_path: logo_path,
           logo_width: logo_width,
           cell_fill_color: cell_fill_color,
+          version: version,
         )
       }
     },
@@ -535,11 +544,13 @@
 
       [
         #box(width: 100%, stroke: (top: 0.6pt + black))
-        #text(size:0.8em)[#title#{if current_section_title != none [*\- PARTIE #numbering("A", current_section_number) - #current_section_title*]}] #h(1fr) #text(size: 10pt)[#current_page/#total_pages]
+        
+        
+        #text(size:0.8em)[#title#{if current_section_title != none and h2_prefix != none [*\- #h2_prefix_word #text[#context counter(heading.where(level: 2)).display()] - #current_section_title*]}] #h(1fr) #text(size: 10pt)[#current_page/#total_pages]
       ]
 
     },
-    header-ascent: 0cm,
+    header-ascent: 1cm,
     footer-descent: 0cm,
   )
   
@@ -556,7 +567,7 @@
   
   )[#text(font:"DejaVu Sans Mono")[#it]]
   */
-  set par(justify: true)
+  set par(justify: true, leading: 0.9em)
   set text(
     size: 11pt,
     lang: "fr",
@@ -601,16 +612,22 @@
     ]
   }
   show heading.where(level: 2): it => {
-    pagebreak()
+
     block(
       above: 1.5em,
       stroke: 1.5pt + black,
       width: 100%,
-      inset: (left: 1.4em, rest: 0.6em),
+      inset: (left: 0.5cm, rest: 0.6em),
       fill: gray.lighten(80%),
     )[
         
-         #text(size: 1.5em, weight: "bold")[PARTIE #counter(heading).display() - #it.body] ]
+         #text(size: 1.5em, weight: "bold")[
+           #if h2_prefix != none [
+             #h2_prefix_word #counter(heading).display() - #it.body
+           ] else [
+             #it.body
+           ]
+         ] ]
   }
   
   show heading.where(level: 3): it => {
@@ -621,6 +638,7 @@
       inset: (left: 2.6em, rest: 0.4em),
       fill: gray.lighten(90%),
     )[
+      
       #text(size: 1.4em, weight: "bold")[#counter(heading.where(level: 2)).display()#counter(heading).display() - #it.body]
     ]
   }
