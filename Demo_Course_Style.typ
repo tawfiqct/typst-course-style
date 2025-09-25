@@ -1,16 +1,41 @@
-#import "@local/course-style:0.0.1": *
+#import "@local/course-style:99.99.99": *
 
 #show: doc => COURSE(
-  class: "Seconde",
-  level: "SNT",
-  duration: "1h30",
-  title: "Documentation du package course-style:0.0.1",
+  class: "Développement",
+  level: "Template",
+  duration: "∞",
+  title: "Documentation du package course-style avec git worktrees",
   cell_fill_color: blue.lighten(90%),
   doc
 )
 
-= Documentation du package course-style:0.0.1
+= Documentation du package course-style
 #outline(title: none, )
+
+== Système de versioning git worktrees
+
+Ce template utilise un système de versioning avec **git worktrees** :
+
+#info_box[
+*Structure :*
+- `current/` : Version de développement (repo git principal)
+- `0.0.1/`, `0.0.2/`... : Versions figées (worktrees pointant sur des tags)
+- Import selon le contexte : `@local/course-style:current` vs `@local/course-style:0.0.1`
+]
+
+=== Configuration VSCode Tinymist
+
+Pour activer les imports `@local`, ajouter à `settings.json` :
+
+```json
+{
+  "tinymist.compileArgs": [
+    "--root",
+    "C:/Users/votre-nom/Documents/_Education Nationale/Cours/_templates"
+  ]
+}
+```
+
 == Installation et configuration
 
 === Installation du package
@@ -283,7 +308,6 @@ Résumé en une phrase :
 #response_block(
   height: 2.5cm,
   width: 80%,
-  inset: 1cm,
   stroke: (dash: "solid", thickness: 1pt),
   correction: "Réponse courte et précise"
 )

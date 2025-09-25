@@ -1,6 +1,6 @@
 [package]
 name = "course-style"
-version = "0.0.1"
+version = "99.99.99"
 entrypoint = "style.typ"
 authors = ["CADI TAZI Tawfiq"]
 license = "MIT"

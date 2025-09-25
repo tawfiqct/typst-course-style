@@ -1,40 +1,85 @@
 # Course Style Package
 
-> Template Typst pour documents pedagogiques
+> Template Typst pour documents pédagogiques 
 
 ## Description
 
-Le package `course-style` est un template Typst concu pour creer des documents pedagogiques elegants et structures. Il offre un ensemble complet de fonctionnalites pour les enseignants et formateurs souhaitant produire des supports de cours professionnels.
+Le package `course-style` est un template Typst conçu pour créer des documents pédagogiques élégants et structurés. 
 
-## Installation
-
-### 1. Creer la structure de dossiers
-
-Creez le dossier suivant dans votre repertoire de packages Typst :
+## Architecture du système
+Il utilise un système de **git worktrees** permettant de maintenir plusieurs versions simultanément (développement et versions figées) avec un **symlink** vers les packages locaux Typst pour un accès direct.
 
 ```
-C:\Users\[votre-nom]\AppData\Local\typst\packages\local\course-style\0.0.1
+_typst_local_packages/
+└─ course-style/
+   ├─ 99.99.99/             # Dépôt git principal (développement actif)
+   │  ├─ .git/             # Repository git complet
+   │  ├─ style.typ         # Template en cours de développement
+   │  ├─ typst.toml        # version = "99.99.99"
+   │  ├─ logo.png          # Logo par défaut
+   │  └─ Demo_Course_Style.typ # Démonstration
+   ├─ 0.0.1/               # Worktree figé sur tag v0.0.1 (futur)
+   │  ├─ .git → 99.99.99/.git/worktrees/0.0.1  # Référence worktree
+   │  ├─ style.typ         # Version figée v0.0.1
+   │  └─ typst.toml        # version = "0.0.1"
+   └─ 0.0.2/               # Worktree figé sur tag v0.0.2 (futur)
+
+%APPDATA%\Local\typst\packages\local\
+└─ course-style → C:\...\\_typst_local_packages\course-style  # Symlink
 ```
 
-### 2. Copier les fichiers
+## Installation et configuration
 
-- Placez le fichier `style.typ` dans ce dossier
-- Placez le fichier `typst.toml` dans ce dossier
-- Ajoutez votre logo `logo.png` au meme niveau que `style.typ`
+### 1. Créer le symlink
 
-### 3. Structure finale
-
-```
-C:\Users\[votre-nom]\AppData\Local\typst\packages\local\course-style\0.0.1
-├── typst.toml
-├── style.typ
-└── logo.png
+**Commande PowerShell (Administrateur requis) :**
+```powershell
+New-Item -ItemType SymbolicLink -Path "$env:LOCALAPPDATA\typst\packages\local\course-style" -Target "C:\votre\chemin\_typst_local_packages\course-style"
 ```
 
-## Utilisation de base
+### Workflow de développement
+
+#### Développement quotidien
+1. Travailler directement dans `_typst_local_packages/course-style/99.99.99/`
+
+#### Créer une version figée
+```bash
+cd 99.99.99/  # Dans le repo git principal
+git tag v1.0.0 -m "Release v1.0.0: Description des changements"
+git worktree add ../1.0.0 v1.0.0
+```
+
+#### Supprimer une version figée
+```bash
+cd 99.99.99/
+git worktree remove ../1.0.0
+```
+
+### 2. Extension VSCode
+
+Installer l'extension **Tinymist Typst** dans VSCode :
+- L'extension installe automatiquement Typst (pas besoin d'installation manuelle)
+- Compile et prévisualise les documents `.typ` directement dans VSCode
+
+
+## Utilisation
+
+### Imports selon le contexte
+
+**Pour le développement (version courante) :**
+```typst
+#import "@local/course-style:99.99.99": *
+```
+
+**Pour les documents en production (versions figées) :**
+```typst
+#import "@local/course-style:1.0.0": *
+```
+
+### Exemple d'usage
 
 ```typst
-#import "@local/course-style:0.0.1": *
+#import "@local/course-style:99.99.99": *
 
 #show: doc => COURSE(
   class: "Seconde",
@@ -49,7 +94,7 @@ C:\Users\[votre-nom]\AppData\Local\typst\packages\local\course-style\0.0.1
 === Sous-section
 
 #definition_box(title: "Variables")[
-  Une variable stocke une valeur en memoire.
+  Une variable stocke une valeur en mémoire.
 ]
 
 #example_box[
@@ -98,8 +143,3 @@ Ce fichier contient :
 - La syntaxe complete pour chaque element
 - Des cas d'usage concrets
 - Les parametres de configuration disponibles
-
-
----
-
-> **Astuce** : Compilez le fichier `Demo_Course_Style.typ` en PDF pour avoir un apercu complet de toutes les fonctionnalites disponibles avec des exemples visuels.
