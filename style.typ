@@ -1,9 +1,10 @@
 #import "@preview/fletcher:0.5.3" as fletcher: diagram, edge, node, shapes
 #import "@preview/gentle-clues:1.2.0": *
 #import "@preview/wrap-it:0.1.1": wrap-content
+#import "@preview/grayness:0.4.1": *
 #set text(lang: "fr")
 
-
+#set text(slashed-zero: true)
 // ===============================
 // CONFIGURATION GLOBALE
 // ===============================
@@ -593,7 +594,11 @@
       inset: 0.4em,
       fill: black,
     )[
-      #align(center)[#text(size: 1.6em, weight: "bold", fill: white)[#it]]
+     
+      #align(center)[#text(size: 1.6em, weight: "bold", fill: white)[
+         #set par(spacing: 0em)
+          #it
+        ]]
     ]
   }
   show heading.where(level: 2): it => {
@@ -624,7 +629,7 @@
       fill: gray.lighten(90%),
     )[
       
-      #text(size: 1.4em, weight: "bold")[#counter(heading.where(level: 2)).display()#counter(heading).display() - #it.body]
+      #text(size: 1.4em, weight: "bold")[#it.body]
     ]
   }
   
@@ -636,7 +641,7 @@
       inset: (left: 3.8em, bottom: 0.3em),
     )[
       
-      #text(size: 1.3em, weight: "bold")[#counter(heading.where(level: 2)).display()#counter(heading).display() - #it.body]
+      #text(size: 1.3em, weight: "bold")[#it.body]
     ]
   }
   
@@ -647,7 +652,7 @@
       width: 100%,
       inset: (left: 5.0em, bottom: 0.2em),
     )[
-      #text(size: 1.2em, weight: "bold")[#counter(heading.where(level: 2)).display()#counter(heading).display() - #it.body]
+      #text(size: 1.2em, weight: "bold")[#it.body]
     ]
   }
   
@@ -657,7 +662,7 @@
       width: 100%,
       inset: (left: 6.2em),
     )[
-      #text(size: 1.1em, weight: "bold")[#counter(heading.where(level: 2)).display()#counter(heading).display() - #it.body]
+      #text(size: 1.1em, weight: "bold")[#it.body]
     ]
   }
   show link: set text(fill: blue)
