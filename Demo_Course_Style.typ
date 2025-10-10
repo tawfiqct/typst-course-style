@@ -1,20 +1,19 @@
 #import "@local/course-style:99.99.99": *
 
 #show: doc => COURSE(
-  class: "Développement",
+  class: "2nd",
   level: "Template",
   duration: "∞",
-  title: "Documentation du package course-style avec git worktrees",
+  theme: "Documentation du package course-style",
+  doc_title: "Documentation du package course-style",
   cell_fill_color: blue.lighten(90%),
+  show_header: true,
   doc
 )
 
-= Documentation du package course-style
-#outline(title: none, )
+= Système de versioning git worktrees
 
-== Système de versioning git worktrees
-
-Ce template utilise un système de versioning avec **git worktrees** :
+Ce template utilise un système de versioning avec *git worktrees* :
 
 #info_box[
 *Structure :*
@@ -23,7 +22,8 @@ Ce template utilise un système de versioning avec **git worktrees** :
 - Import selon le contexte : `@local/course-style:current` vs `@local/course-style:0.0.1`
 ]
 
-=== Configuration VSCode Tinymist
+== Configuration VSCode Tinymist
+
 
 Pour activer les imports `@local`, ajouter à `settings.json` :
 
@@ -36,9 +36,9 @@ Pour activer les imports `@local`, ajouter à `settings.json` :
 }
 ```
 
-== Installation et configuration
+= Installation et configuration
 
-=== Installation du package
+== Installation du package
 1. *Créer la structure de dossiers* :
    Créez le dossier suivant dans votre répertoire de packages Typst :
    ```
@@ -58,7 +58,7 @@ Pour activer les imports `@local`, ajouter à `settings.json` :
    └── logo.png
    ```
 
-=== Configuration du package (typst.toml)
+== Configuration du package (typst.toml)
 
 Le fichier `typst.toml` doit contenir la configuration suivante :
 
@@ -72,17 +72,17 @@ license = "MIT"
 description = "Template for educational documents and courses"
 ```
 
-== Exemple d'arborescence de titres
+= Exemple d'arborescence de titres
+== Titre de niveau 2 (exemple)
 === Titre de niveau 3 (exemple)
-==== Titre de niveau 4 (exemple)
-===== Titre de niveau 5 (exemple de hiérarchie)
-====== Titre de niveau 6 (structure complète)
+==== Titre de niveau 4 (exemple de hiérarchie)
+===== Titre de niveau 5 (structure complète)
 
 Ce document présente toutes les fonctionnalités disponibles dans le module `course-style:0.0.1` pour créer des documents pédagogiques.
 
-== Configuration de base
+= Configuration de base
 
-=== Import et utilisation
+== Import et utilisation
 
 #grid(columns: (auto, 1fr), stroke: 0.5pt + gray, inset: 1em,
 [
@@ -117,9 +117,9 @@ Ce document présente toutes les fonctionnalités disponibles dans le module `co
 
 
 
-== Encadrés personnalisés
+= Encadrés personnalisés
 
-=== Encadré générique
+== Encadré générique
 
 #grid(
   columns: (1fr, 1fr),
@@ -165,9 +165,32 @@ Ce document présente toutes les fonctionnalités disponibles dans le module `co
   ]
 )
 
+== Activités numérotées
+
+La fonction `#activity()` permet de créer des en-têtes d'activités avec numérotation automatique :
+
+*Activité sans titre :*
+```typst
+#activity("")
+```
+#activity("")
+
+*Activité avec titre :*
+```typst
+#activity("Découverte de Python")
+```
+#activity("Découverte de Python")
 
 
-=== Tableaux vides
+#info_box[
+*Fonctionnement :*
+- Numérotation automatique globale (ne se réinitialise pas)
+- Style cohérent avec les encadrés pédagogiques
+- Icône 🎯 pour identifier rapidement les activités
+- Titre optionnel pour décrire l'activité
+]
+
+== Tableaux vides
 
 *Tableau par défaut (solide) :*
 ```typst
@@ -205,9 +228,9 @@ Ce document présente toutes les fonctionnalités disponibles dans le module `co
 ```
 #empty_table(cols: 3, rows: 5, striped: true, header_fill: gray.darken(20%))
 
-== Système de corrections
+= Système de corrections
 
-=== Lignes d'écriture
+== Lignes d'écriture
 
 *Lignes complètes sans correction :*
 ```typst
@@ -249,13 +272,13 @@ Que pensez-vous ? #lines(count: 3, correction: "C'est très pratique pour les co
 #set_correction(true)
 Que pensez-vous ? #lines(count: 3, correction: "C'est très pratique pour les corrections")
 
-=== Configuration des corrections
+== Configuration des corrections
 ```typst
 #set_correction(true)   // Active les corrections
 #set_correction(false)  // Masque les corrections
 ```
 
-=== Trous à compléter
+== Trous à compléter
 ```typst
 #set_correction(false)
 #gap(width: 6cm)
@@ -270,7 +293,7 @@ Voici un trou vide : #gap(width: 6cm)\
 #set_correction(true)
 Trou avec correction : #gap(width: 6cm, correction: "La réponse")
 
-=== Blocs de réponse
+== Blocs de réponse
 
 *Bloc de réponse sans correction :*
 ```typst
@@ -312,9 +335,9 @@ Résumé en une phrase :
   correction: "Réponse courte et précise"
 )
 
-== Modules externes intégrés
+= Modules externes intégrés
 
-=== gentle-clues : Encadrés pédagogiques
+== gentle-clues : Encadrés pédagogiques
 
 #grid(
   columns: (1fr, 1fr),

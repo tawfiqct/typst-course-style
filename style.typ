@@ -218,11 +218,7 @@
 }
 
 // Function for auto-incrementing activities
-#let activity(
-  title: "",
-  breakable: true,
-  content
-) = context {
+#let activity(title) = context {
   // Simple global counter for activities without reset
   let activity_counter = counter("activity-global")
   activity_counter.step()
@@ -235,8 +231,37 @@
     "Activité " + str(activity_num)
   }
 
-  // Use goal from gentle-clues
-  goal(title: full_title, breakable: breakable)[#content]
+  // Custom header style matching goal design
+  v(1em)
+  block(
+    width: 100%,
+    breakable: false,
+    above: 0em,
+    below: 0.6em,
+    {
+      // Header box with icon and title - matching goal style
+      rect(
+        width: 100%,
+        inset: (left: 0.6em),
+        fill: rgb("#fbe3e5"),  // Light red/pink background (softer)
+        stroke: (
+          left: 2pt + rgb("#e74c3c"),   // Thicker red left border
+          rest: 0.3pt + rgb("#e74c3c")     // Thin borders on other sides
+        ),
+        {
+          align(center)[
+            
+          // Icon + Title
+          #text(
+            size: 1.1em,
+            weight: "bold",
+            fill: black
+          )[🎯 #full_title 🎯]
+          ]
+        }
+      )
+    }
+  )
 }
 
 #let yield_cells(cols, rows, stroke_style, fill_color: none, striped: false, is_header: false) = {
@@ -322,7 +347,7 @@
           rect(
             fill: white,
             radius: 5pt,
-            inset: 4pt,
+            inset: 3pt,
             [#text(weight: "bold", size: title_size, fill: color.darken(20%))[#title]],
           ),
         )
@@ -474,20 +499,12 @@
         #title
       ]
     ],
-    [*#context {
-      let pages = counter(page).final().first()
-      str(pages) + " page" + if pages > 1 { "s" } else { "" }
-    }*],
     
-    table.cell(fill: cell_fill_color, align: center)[
+    
+    table.cell(colspan: 4, fill: cell_fill_color, align: left)[
+Nom/Prénom : 
+    ],
 
-    ],
-    table.cell(fill: cell_fill_color)[],
-    table.cell(fill: cell_fill_color)[
-            #if version != none [
-        #text(size: 11pt, weight: "bold")[v#version]
-      ]
-    ],
   )
 }
 
@@ -496,7 +513,8 @@
   class: "Seconde",
   level: "SNT",
   duration: "2h",
-  title: "Titre du document",
+  theme: "Titre du document",
+  doc_title: none,  // Grand titre du document (affiché en haut)
   academy: "ACADÉMIE DE NANTES",
   school: "LPO CARNOT BERTIN",
   logo_path: "logo.png",
@@ -511,7 +529,7 @@
   // Simplified solution: fixed but optimized margins
   set page(
     numbering: "1",
-    margin: (top: 1cm, bottom: 1.2cm, left: 0.5cm, right: 0.5cm),
+    margin: (top: 0.8cm, bottom: 1.2cm, left: 0.4cm, right: 0.4cm),
     footer: context {
       let current_page = counter(page).get().first()
       let total_pages = counter(page).final().first()
@@ -532,7 +550,7 @@
         #box(width: 100%, stroke: (top: 0.6pt + black))
         
         
-        #text(size:0.8em)[#title#{if current_section_title != none and h2_prefix != none [*\- #h2_prefix_word #text[#context counter(heading.where(level: 2)).display()] - #current_section_title*]}] #h(1fr) #text(size: 10pt)[#current_page/#total_pages]
+        #text(size:0.8em)[#theme#{if current_section_title != none and h2_prefix != none [*\- #h2_prefix_word #text[#context counter(heading.where(level: 2)).display()] - #current_section_title*]}] #h(1fr) #text(size: 10pt)[#current_page/#total_pages]
       ]
 
     },
@@ -559,18 +577,42 @@
     lang: "fr",
   )
   set heading(numbering: (..nums) => {
-    let formats = ("  ", "A", "1", "1.1", "1.1.1", "1.1.1.1")
-   if nums.pos().len() == 2 {
-      numbering(formats.at(1), nums.pos().at(1))
+    // Niveau 1 : A, B, C... (sections principales)
+    // Niveau 2 : A1, A2, A3... (sous-sections)
+    // Niveau 3 : A1.1, A1.2... (sous-sous-sections)
+    // etc.
+
+    if nums.pos().len() == 1 {
+      // Niveau 1 : A, B, C...
+      numbering("A", nums.pos().at(0))
+    } else if nums.pos().len() == 2 {
+      // Niveau 2 : A1, A2...
+      numbering("A", nums.pos().at(0)) + numbering("1", nums.pos().at(1))
     } else if nums.pos().len() == 3 {
-      numbering(formats.at(2), nums.pos().at(2))
+      // Niveau 3 : A1.1, A1.2...
+      numbering("A", nums.pos().at(0)) + numbering("1", nums.pos().at(1)) + "." + numbering("1", nums.pos().at(2))
     } else if nums.pos().len() == 4 {
-      numbering("1", nums.pos().at(2)) + "." + numbering("1", nums.pos().at(3))
+      // Niveau 4 : A1.1.1, A1.1.2...
+      numbering("A", nums.pos().at(0)) + numbering("1", nums.pos().at(1)) + "." + numbering("1", nums.pos().at(2)) + "." + numbering("1", nums.pos().at(3))
     } else if nums.pos().len() == 5 {
-      numbering("1", nums.pos().at(2)) + "." + numbering("1", nums.pos().at(3)) + "." + numbering("1", nums.pos().at(4))
-    } else if nums.pos().len() == 6 {
+      // Niveau 5 : A1.1.1.1, A1.1.1.2...
       (
-        numbering("1", nums.pos().at(2))
+        numbering("A", nums.pos().at(0))
+          + numbering("1", nums.pos().at(1))
+          + "."
+          + numbering("1", nums.pos().at(2))
+          + "."
+          + numbering("1", nums.pos().at(3))
+          + "."
+          + numbering("1", nums.pos().at(4))
+      )
+    } else if nums.pos().len() == 6 {
+      // Niveau 6 : A1.1.1.1.1, A1.1.1.1.2...
+      (
+        numbering("A", nums.pos().at(0))
+          + numbering("1", nums.pos().at(1))
+          + "."
+          + numbering("1", nums.pos().at(2))
           + "."
           + numbering("1", nums.pos().at(3))
           + "."
@@ -586,83 +628,94 @@
   show figure: it => [#it #v(0.5em)]
   
   
+  // Niveau 1: Sections principales avec numérotation A, B, C...
   show heading.where(level: 1): it => {
+    
     block(
-      above: 0.5em,
-      stroke: 1pt + black,
+      above: 0.9em,
       width: 100%,
-      inset: 0.4em,
-      fill: black,
+      inset: (left: 0.8em, rest: 0.6em),
+      radius: 6pt,
+      fill: rgb("#001845").lighten(30%),
+      stroke: (
+        left: 6pt + rgb("#001845"),
+        rest: 2pt + rgb("#001845")
+      ),
     )[
-     
-      #align(center)[#text(size: 1.6em, weight: "bold", fill: white)[
-         #set par(spacing: 0em)
-          #it
-        ]]
+      #set par(leading: 0.3em)
+      #text(size: 1.5em, weight: "bold", fill: white)[
+        #counter(heading).display() 🔹 #it.body
+      ]
     ]
   }
-  show heading.where(level: 2): it => {
 
+  // Niveau 2: Sous-sections
+  show heading.where(level: 2): it => {
     block(
-      above: 1.5em,
-      stroke: 1.5pt + black,
+      above: 1em,
       width: 100%,
-      inset: (left: 0.5cm, rest: 0.6em),
-      fill: gray.lighten(80%),
+      inset: (left: 0.7em, rest: 0.5em),
+      radius: 5pt,
+      fill: rgb("#003560").lighten(35%),
+      stroke: (
+        left: 5pt + rgb("#003560"),
+        rest: 1.5pt + rgb("#003560")
+      ),
     )[
-        
-         #text(size: 1.5em, weight: "bold")[
-           #if h2_prefix != none [
-             #h2_prefix_word #counter(heading).display() - #it.body
-           ] else [
-             #it.body
-           ]
-         ] ]
+      #text(size: 1.3em, weight: "bold", fill: white)[
+        #set par(leading: 0.3em)
+        #counter(heading).display() ▸ #it.body
+      ]
+    ]
   }
-  
+
+  // Niveau 3: Sous-sous-sections
   show heading.where(level: 3): it => {
     block(
-      above: 1em,
-      stroke: 1pt + black,
+      above: 0.8em,
       width: 100%,
-      inset: (left: 2.6em, rest: 0.4em),
-      fill: gray.lighten(90%),
+      inset: (left: 0.5em, top: 0.3em, bottom: 0.4em),
+      fill: rgb("#002617").lighten(40%),
+      stroke: (bottom: 4pt + rgb("#002617")),
+      radius: 4pt,
     )[
-      
-      #text(size: 1.4em, weight: "bold")[#it.body]
+      #text(size: 1.2em, weight: "bold", fill: white)[
+        #set par(leading: 0.3em)
+        #counter(heading).display() ◆ #it.body
+      ]
     ]
   }
-  
+
+  // Niveau 4: Détails
   show heading.where(level: 4): it => {
     block(
-      above: 1em,
-      stroke: (bottom: 2pt + black),
+      above: 0.7em,
       width: 100%,
-      inset: (left: 3.8em, bottom: 0.3em),
+      inset: (left: 1em, top: 0.2em, bottom: 0.3em),
+      fill: rgb("#0D3B17").lighten(45%),
+      stroke: (bottom: 3pt + rgb("#0D3B17")),
+      radius: 3pt,
     )[
-      
-      #text(size: 1.3em, weight: "bold")[#it.body]
+      #text(size: 1.1em, weight: "bold", fill: white)[
+        #set par(leading: 0.3em)
+        #counter(heading).display() • #it.body
+      ]
     ]
   }
-  
+
+  // Niveau 5: Sous-détails
   show heading.where(level: 5): it => {
     block(
-      above: 0.8em,
-      stroke: (bottom: 1pt + gray),
+      above: 0.6em,
       width: 100%,
-      inset: (left: 5.0em, bottom: 0.2em),
+      inset: (left: 1.2em, top: 0.2em, bottom: 0.2em),
+      fill: rgb("#1A1A1A").lighten(50%),
+      radius: 3pt,
     )[
-      #text(size: 1.2em, weight: "bold")[#it.body]
-    ]
-  }
-  
-  show heading.where(level: 6): it => {
-    block(
-      above: 0.5em,
-      width: 100%,
-      inset: (left: 6.2em),
-    )[
-      #text(size: 1.1em, weight: "bold")[#it.body]
+      #text(size: 1em, weight: "bold", fill: white)[
+        #set par(leading: 0.3em)
+        #counter(heading).display() ‣ #it.body
+      ]
     ]
   }
   show link: set text(fill: blue)
@@ -674,7 +727,7 @@
         class: class,
         level: level,
         duration: duration,
-        title: title,
+        title: theme,
         academy: academy,
         school: school,
         logo_path: logo_path,
@@ -683,6 +736,29 @@
         version: version,
       )
     ]
+
+    // Afficher le grand titre du document si fourni
+    #if doc_title != none [
+      #block(
+        width: 100%,
+        inset: 1em,
+        radius: 8pt,
+        fill: gradient.linear(
+          rgb("#001845"),
+          rgb("#002617"),
+          angle: 45deg
+        ),
+        stroke: 3pt + black,
+      )[
+        #align(center)[
+          #text(size: 2em, weight: "bold", fill: white)[
+            #set par(spacing: 0em)
+            #doc_title
+          ]
+        ]
+      ]
+    ]
+
     #body
   ]
 }
