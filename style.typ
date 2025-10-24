@@ -64,6 +64,39 @@
   #let correction_enabled = correction_state.get()
   #h(margin)
   #if correction_enabled and correction != "" [
+    #block(rect(
+      width: width,
+      height: if height == auto { 0.5em } else { height },
+      outset: if outset == auto { 5pt } else { outset },
+      inset: 0pt,
+      stroke: stroke,
+      fill: if fill == auto { yellow.lighten(80%) } else { fill },
+      [#text(size: 9pt, correction)],
+    ))
+  ] else [
+    #block(rect(
+      width: width,
+      inset: 0pt,
+      outset: if outset == auto { 5pt } else { outset },
+      height: if height == auto { 0.5em } else { height },
+      stroke: stroke,
+      fill: if fill == auto { none } else { fill },
+    ))
+  ]
+  #h(margin)
+]
+#let gapb(
+  width: 100%,
+  margin: 1em,
+  correction: "",
+  stroke: (dash: "dotted", thickness: 0.7pt),
+  outset: auto,
+  height: auto,
+  fill: auto
+) = context [
+  #let correction_enabled = correction_state.get()
+  #h(margin)
+  #if correction_enabled and correction != "" [
     #box(rect(
       width: width,
       height: if height == auto { 0.5em } else { height },
@@ -85,7 +118,6 @@
   ]
   #h(margin)
 ]
-
 
 // Function to complete a line + additional lines
 #let lines(
@@ -232,26 +264,24 @@
   }
 
   // Custom header style matching goal design
-  v(1em)
+  v(0.5em)
   block(
     width: 100%,
     breakable: false,
-    above: 0em,
-    below: 0.6em,
+    above: 0.1em,
+    below: 0.3em,
     {
       // Header box with icon and title - matching goal style
       rect(
         width: 100%,
-        inset: (left: 0.6em),
         fill: rgb("#fbe3e5"),  // Light red/pink background (softer)
+  
         stroke: (
           left: 2pt + rgb("#e74c3c"),   // Thicker red left border
           rest: 0.3pt + rgb("#e74c3c")     // Thin borders on other sides
         ),
         {
           align(center)[
-            
-          // Icon + Title
           #text(
             size: 1.1em,
             weight: "bold",
@@ -262,6 +292,7 @@
       )
     }
   )
+  v(0.5em)
 }
 
 #let yield_cells(cols, rows, stroke_style, fill_color: none, striped: false, is_header: false) = {
@@ -356,6 +387,7 @@
       #content
     ],
   )
+    v(0em)
 }
 
 // Specific boxes using generic function
@@ -466,6 +498,7 @@
   logo_path: "logo.png",
   logo_width: 1cm,
   cell_fill_color: yellow,
+  jaune: "Nom/Prénom : ",
   version: none,
 ) = {
   table(
@@ -502,7 +535,7 @@
     
     
     table.cell(colspan: 4, fill: cell_fill_color, align: left)[
-Nom/Prénom : 
+#jaune
     ],
 
   )
@@ -521,6 +554,7 @@ Nom/Prénom :
   logo_width: 1cm,
   cell_fill_color: yellow,
   version: none,
+  jaune: "Nom/Prénom : ",
   h2_prefix: none,  // Option pour ajouter un préfixe aux titres de niveau 2
   h2_prefix_word: "Partie",  // Mot à utiliser pour le préfixe
   show_header: false,  // Option pour afficher l'en-tête
@@ -529,7 +563,7 @@ Nom/Prénom :
   // Simplified solution: fixed but optimized margins
   set page(
     numbering: "1",
-    margin: (top: 0.8cm, bottom: 1.2cm, left: 0.4cm, right: 0.4cm),
+    margin: (top: 0.8cm, bottom: 1.2cm, left: 0.5cm, right: 0.5cm),
     footer: context {
       let current_page = counter(page).get().first()
       let total_pages = counter(page).final().first()
@@ -632,9 +666,9 @@ Nom/Prénom :
   show heading.where(level: 1): it => {
     
     block(
-      above: 0.9em,
+      above: 0.5em,
       width: 100%,
-      inset: (left: 0.8em, rest: 0.6em),
+      inset: (left: 0.8em, rest: 0.4em),
       radius: 6pt,
       fill: rgb("#001845").lighten(30%),
       stroke: (
@@ -643,8 +677,8 @@ Nom/Prénom :
       ),
     )[
       #set par(leading: 0.3em)
-      #text(size: 1.5em, weight: "bold", fill: white)[
-        #counter(heading).display() 🔹 #it.body
+      #text(size: 1.1em, weight: "bold", fill: white)[
+        #counter(heading).display()🔹#it.body
       ]
     ]
   }
@@ -652,9 +686,9 @@ Nom/Prénom :
   // Niveau 2: Sous-sections
   show heading.where(level: 2): it => {
     block(
-      above: 1em,
+      above: 0.5em,
       width: 100%,
-      inset: (left: 0.7em, rest: 0.5em),
+      inset: (left: 0.7em, rest: 0.4em),
       radius: 5pt,
       fill: rgb("#003560").lighten(35%),
       stroke: (
@@ -662,9 +696,9 @@ Nom/Prénom :
         rest: 1.5pt + rgb("#003560")
       ),
     )[
-      #text(size: 1.3em, weight: "bold", fill: white)[
+      #text(size: 1.05em, weight: "bold", fill: white)[
         #set par(leading: 0.3em)
-        #counter(heading).display() ▸ #it.body
+        #counter(heading).display()▸#it.body
       ]
     ]
   }
@@ -672,14 +706,14 @@ Nom/Prénom :
   // Niveau 3: Sous-sous-sections
   show heading.where(level: 3): it => {
     block(
-      above: 0.8em,
+      above: 0.5em,
       width: 100%,
       inset: (left: 0.5em, top: 0.3em, bottom: 0.4em),
       fill: rgb("#002617").lighten(40%),
       stroke: (bottom: 4pt + rgb("#002617")),
       radius: 4pt,
     )[
-      #text(size: 1.2em, weight: "bold", fill: white)[
+      #text(size: 1.04em, weight: "bold", fill: white)[
         #set par(leading: 0.3em)
         #counter(heading).display() ◆ #it.body
       ]
@@ -689,14 +723,14 @@ Nom/Prénom :
   // Niveau 4: Détails
   show heading.where(level: 4): it => {
     block(
-      above: 0.7em,
+      above: 0.5em,
       width: 100%,
       inset: (left: 1em, top: 0.2em, bottom: 0.3em),
       fill: rgb("#0D3B17").lighten(45%),
       stroke: (bottom: 3pt + rgb("#0D3B17")),
       radius: 3pt,
     )[
-      #text(size: 1.1em, weight: "bold", fill: white)[
+      #text(size: 1.03em, weight: "bold", fill: white)[
         #set par(leading: 0.3em)
         #counter(heading).display() • #it.body
       ]
@@ -706,13 +740,13 @@ Nom/Prénom :
   // Niveau 5: Sous-détails
   show heading.where(level: 5): it => {
     block(
-      above: 0.6em,
+      above: 0.5em,
       width: 100%,
       inset: (left: 1.2em, top: 0.2em, bottom: 0.2em),
       fill: rgb("#1A1A1A").lighten(50%),
       radius: 3pt,
     )[
-      #text(size: 1em, weight: "bold", fill: white)[
+      #text(size: 1.01em, weight: "bold", fill: white)[
         #set par(leading: 0.3em)
         #counter(heading).display() ‣ #it.body
       ]
@@ -731,18 +765,23 @@ Nom/Prénom :
         academy: academy,
         school: school,
         logo_path: logo_path,
+        jaune: jaune,
         logo_width: logo_width,
         cell_fill_color: cell_fill_color,
         version: version,
       )
     ]
-
+  #set text(
+    size: 11pt,
+    lang: "fr",
+  )
     // Afficher le grand titre du document si fourni
     #if doc_title != none [
       #block(
+        above: 0.5em,
         width: 100%,
-        inset: 1em,
-        radius: 8pt,
+        inset: 0.6em,
+        radius: 4pt,
         fill: gradient.linear(
           rgb("#001845"),
           rgb("#002617"),
@@ -751,7 +790,7 @@ Nom/Prénom :
         stroke: 3pt + black,
       )[
         #align(center)[
-          #text(size: 2em, weight: "bold", fill: white)[
+          #text(size: 1.6em, weight: "bold", fill: white)[
             #set par(spacing: 0em)
             #doc_title
           ]
