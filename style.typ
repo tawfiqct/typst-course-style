@@ -77,9 +77,9 @@
     #block(rect(
       width: width,
       inset: 0pt,
+      stroke: stroke,
       outset: if outset == auto { 5pt } else { outset },
       height: if height == auto { 0.5em } else { height },
-      stroke: stroke,
       fill: if fill == auto { none } else { fill },
     ))
   ]
@@ -518,8 +518,8 @@
           #school
         ],
       )],
-    [Classe #linebreak() #text(weight: "bold", size: 12pt)[#class]],
-    [Durée : #linebreak() #duration],
+    [ ],
+    [Date  #linebreak()#linebreak()],
     table.cell(colspan: 3, align: (center))[
       #text(weight: "bold", size: 20pt)[#level]
     ],
@@ -593,67 +593,86 @@
   )
   
   
+  // Style pour le code inline
   show raw.where(block: false): it => box(
     fill: luma(235),
     inset: (x: 3pt),
     outset: (y: 3pt),
     radius: 2pt,
-  )[#it]
-  
-  /*
-  show raw.where(block: true): it => block(
-  
-  )[#text(font:"DejaVu Sans Mono")[#it]]
-  */
+  )[
+    #set text(fill: black)
+    #it
+
+  ]
+
+  // Style pour les blocs de code Python (Style 4 : Fond dégradé subtil)
+  show raw.where(block: true, lang: "python"): it => {
+    block(
+      width: 100%,
+      fill: gradient.linear(rgb("#e3f2fd"), rgb("#f5f7fa"), angle: 135deg),
+      stroke: (left: 4pt + rgb("#2196F3"), rest: 1pt + rgb("#bbdefb")),
+      radius: 5pt,
+      inset: (left: 1.2em, y: 1em, right: 1em),
+      above: 0.8em,
+      below: 0.8em,
+      it
+    )
+  }
   set par(justify: true, leading: 0.9em)
   set text(
     size: 11pt,
     lang: "fr",
   )
-  set heading(numbering: (..nums) => {
-    // Niveau 1 : A, B, C... (sections principales)
-    // Niveau 2 : A1, A2, A3... (sous-sections)
-    // Niveau 3 : A1.1, A1.2... (sous-sous-sections)
-    // etc.
+  set heading(numbering: if h2_prefix == false {
+    // Mode sans préfixe : fonction qui retourne une chaîne vide
+    (..nums) => ""
+  } else {
+    // Mode avec préfixe : numérotation A, B, C...
+    (..nums) => {
+      // Niveau 1 : A, B, C... (sections principales)
+      // Niveau 2 : A1, A2, A3... (sous-sections)
+      // Niveau 3 : A1.1, A1.2... (sous-sous-sections)
+      // etc.
 
-    if nums.pos().len() == 1 {
-      // Niveau 1 : A, B, C...
-      numbering("A", nums.pos().at(0))
-    } else if nums.pos().len() == 2 {
-      // Niveau 2 : A1, A2...
-      numbering("A", nums.pos().at(0)) + numbering("1", nums.pos().at(1))
-    } else if nums.pos().len() == 3 {
-      // Niveau 3 : A1.1, A1.2...
-      numbering("A", nums.pos().at(0)) + numbering("1", nums.pos().at(1)) + "." + numbering("1", nums.pos().at(2))
-    } else if nums.pos().len() == 4 {
-      // Niveau 4 : A1.1.1, A1.1.2...
-      numbering("A", nums.pos().at(0)) + numbering("1", nums.pos().at(1)) + "." + numbering("1", nums.pos().at(2)) + "." + numbering("1", nums.pos().at(3))
-    } else if nums.pos().len() == 5 {
-      // Niveau 5 : A1.1.1.1, A1.1.1.2...
-      (
+      if nums.pos().len() == 1 {
+        // Niveau 1 : A, B, C...
         numbering("A", nums.pos().at(0))
-          + numbering("1", nums.pos().at(1))
-          + "."
-          + numbering("1", nums.pos().at(2))
-          + "."
-          + numbering("1", nums.pos().at(3))
-          + "."
-          + numbering("1", nums.pos().at(4))
-      )
-    } else if nums.pos().len() == 6 {
-      // Niveau 6 : A1.1.1.1.1, A1.1.1.1.2...
-      (
-        numbering("A", nums.pos().at(0))
-          + numbering("1", nums.pos().at(1))
-          + "."
-          + numbering("1", nums.pos().at(2))
-          + "."
-          + numbering("1", nums.pos().at(3))
-          + "."
-          + numbering("1", nums.pos().at(4))
-          + "."
-          + numbering("1", nums.pos().at(5))
-      )
+      } else if nums.pos().len() == 2 {
+        // Niveau 2 : A1, A2...
+        numbering("A", nums.pos().at(0)) + numbering("1", nums.pos().at(1))
+      } else if nums.pos().len() == 3 {
+        // Niveau 3 : A1.1, A1.2...
+        numbering("A", nums.pos().at(0)) + numbering("1", nums.pos().at(1)) + "." + numbering("1", nums.pos().at(2))
+      } else if nums.pos().len() == 4 {
+        // Niveau 4 : A1.1.1, A1.1.2...
+        numbering("A", nums.pos().at(0)) + numbering("1", nums.pos().at(1)) + "." + numbering("1", nums.pos().at(2)) + "." + numbering("1", nums.pos().at(3))
+      } else if nums.pos().len() == 5 {
+        // Niveau 5 : A1.1.1.1, A1.1.1.2...
+        (
+          numbering("A", nums.pos().at(0))
+            + numbering("1", nums.pos().at(1))
+            + "."
+            + numbering("1", nums.pos().at(2))
+            + "."
+            + numbering("1", nums.pos().at(3))
+            + "."
+            + numbering("1", nums.pos().at(4))
+        )
+      } else if nums.pos().len() == 6 {
+        // Niveau 6 : A1.1.1.1.1, A1.1.1.1.2...
+        (
+          numbering("A", nums.pos().at(0))
+            + numbering("1", nums.pos().at(1))
+            + "."
+            + numbering("1", nums.pos().at(2))
+            + "."
+            + numbering("1", nums.pos().at(3))
+            + "."
+            + numbering("1", nums.pos().at(4))
+            + "."
+            + numbering("1", nums.pos().at(5))
+        )
+      }
     }
   })
   
